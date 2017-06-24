@@ -1,22 +1,32 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import { SongList } from './components/song-list/song-list.component';
+import React from 'react';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import thunk from 'redux-thunk';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get swifty, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <SongList/>
-      </div>
-    );
-  }
-}
+import { playlist } from './store/playlist.reducer';
+import { selectedSong } from './store/selectedSong.reducer';
+
+import { EditablePlaylist } from './components/editable-playlist/editable-playlist.component';
+import { loadState } from './services/local-storage.service';
+
+const savedPlaylistState = loadState(); // Load initial state from local storage
+
+const store = createStore(
+    combineReducers({
+        playlist,
+        selectedSong
+    }),
+    savedPlaylistState,
+    composeWithDevTools(
+        applyMiddleware(thunk)
+    )
+);
+
+const App = () => (
+    <Provider store={store}>
+        <EditablePlaylist/>
+    </Provider>
+);
 
 export default App;
