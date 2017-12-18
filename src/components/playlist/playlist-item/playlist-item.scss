@@ -1,0 +1,18 @@
+.playlist-item {
+  background: seashell;
+  padding: 10px;
+
+  &--loaded {
+    background: lightblue;
+    &:before {
+      content: '--> ';
+    }
+    &:after {
+      content: ' <--';
+    }
+  }
+
+  &__remove-btn {
+    float: right;
+  }
+}

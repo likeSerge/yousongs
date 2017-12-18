@@ -3,7 +3,7 @@ import './playlist-item.css';
 
 export class PlaylistItem extends Component {
     render() {
-        const {title, onClickPlay, isLoaded, isPlaying} = this.props;
+        const {title, onClickPlay, isLoaded, isPlaying, onClickRemove} = this.props;
         const containerClassNames = `playlist-item 
             ${isLoaded ? 'playlist-item--loaded' : ''}`;
         return (
@@ -12,7 +12,10 @@ export class PlaylistItem extends Component {
                     {isPlaying && 'Pause'}
                     {!isPlaying && 'Play'}
                 </button>
-                - {title}
+                {' ' + title}
+                <button className="playlist-item__remove-btn" onClick={onClickRemove}>
+                    Remove
+                </button>
             </div>
         );
     }

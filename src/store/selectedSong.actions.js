@@ -1,11 +1,12 @@
-import { playOrPauseVideo } from '../services/yt-player.service';
+import { playOrPauseVideo, seekVideoToSeconds } from '../services/yt-player.service';
 import { isSelectedSongPlaying } from './selectedSong.reducer';
 
-const toggleplaySongAction = (videoId, playingStatus) => ({
+const togglePlaySongAction = (videoId, playingStatus, lastActionPlayTime) => ({
     type: 'SELECTED_SONG/TOGGLE_PLAY',
     payload: {
         id: videoId,
-        isPlaying: playingStatus
+        isPlaying: playingStatus,
+        lastActionPlayTime: lastActionPlayTime
     }
 });
 
@@ -13,7 +14,16 @@ const loadSongAction = (videoId) => ({
     type: 'SELECTED_SONG/LOAD',
     payload: {
         id: videoId,
-        isPlaying: false
+        isPlaying: false,
+        lastActionPlayTime: 0
+    }
+});
+
+const seekToAction = (videoId, secondsToSeek) => ({
+    type: 'SELECTED_SONG/SEEK',
+    payload: {
+        id: videoId,
+        lastActionPlayTime: secondsToSeek
     }
 });
 
@@ -33,16 +43,31 @@ export const togglePlaySong = (videoId) => (dispatch, getState) => {
     onStateChangeSubscription.unsubscribe && onStateChangeSubscription.unsubscribe();
 
     const {ytPlayerOnReady$, ytPlayerStateChange$} = playOrPauseVideo(videoId);
-    ytPlayerOnReady$.subscribe((ytPlayerReadyEvent) => {
-        ytPlayerReadyEvent.target.playVideo();
-        dispatch(loadSongAction(videoId));
-    });
+    ytPlayerOnReady$.subscribe(
+        (ytPlayerReadyEvent) => {
+            ytPlayerReadyEvent.target.playVideo();
+            dispatch(loadSongAction(videoId));
+        }
+    );
     onStateChangeSubscription = ytPlayerStateChange$.subscribe((ytPlayerStateChangeEvent) => {
+        const lastActionPlayTime = ytPlayerStateChangeEvent.target.getCurrentTime();
         const playerState = ytPlayerStateChangeEvent.target.getPlayerState();
         if (playerState === window.YT.PlayerState.PLAYING) {
-            dispatch(toggleplaySongAction(videoId, true));
+            dispatch(togglePlaySongAction(videoId, true, lastActionPlayTime));
         } else if (isSelectedSongPlaying(getState())) {
-            dispatch(toggleplaySongAction(videoId, false));
+            dispatch(togglePlaySongAction(videoId, false, lastActionPlayTime));
         }
     });
+};
+
+/**
+ * Seek video to deseconds
+ * @param {string} videoId
+ * @param {number} seconds
+ */
+export const seekToSeconds = (videoId, seconds) => (dispatch, getState) => {
+    dispatch(seekToAction(videoId, seconds));
+    // Also action togglePlaySongAction will be dispatched inside 'onStateChangeSubscription'
+    // in 'togglePlaySong' thunk action creator, after seekVideoToSeconds call
+    seekVideoToSeconds(videoId, seconds);
 };

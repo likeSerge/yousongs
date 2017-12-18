@@ -67,10 +67,25 @@ export function playOrPauseVideo(videoId) {
 
 /**
  * @public
+ * Seek to seconds
+ * @param {string} videoId
+ * @param {number} seconds
+ */
+export function seekVideoToSeconds(videoId, seconds) {
+    if (player && player.getVideoData().video_id === videoId) {
+        player.seekTo(seconds, true);
+    } else {
+        throw new Error(`Failed to seekTo on vid#${videoId},
+        actually loaded vid#${player.getVideoData().video_id}`);
+    }
+}
+
+/**
+ * @public
  * Load new secondary player for getting video info
  * @param {string} videoId
  */
-export function getVideoInfo(videoId) {
+export function getVideoInfoPlayerStream(videoId) {
     if (playerSecondary) {
         playerSecondary.destroy();
     }

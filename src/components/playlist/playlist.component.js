@@ -1,19 +1,20 @@
 import React from 'react';
-import { PlaylistItem } from '../playlist-item/playlist-item.component';
+import { PlaylistItem } from './playlist-item/playlist-item.component';
 import './playlist.css';
 
-export const Playlist = ({playlist, selectedSong, togglePlaySong}) => (
+export const Playlist = ({playlist, selectedSong, togglePlaySong, removePlaylistItem}) => (
     <div className="playlist">
         playlist
-        {playlist.map((video) =>
+        {Object.keys(playlist).map((videoId) =>
             <PlaylistItem
-                key={video.uuid}
-                title={video.title}
-                isLoaded={selectedSong.id === video.id}
+                key={videoId}
+                title={playlist[videoId].title}
+                isLoaded={selectedSong.id === videoId}
                 isPlaying={
-                    selectedSong.id === video.id && selectedSong.isPlaying
+                    selectedSong.id === videoId && selectedSong.isPlaying
                 }
-                onClickPlay={() => togglePlaySong(video.id)}
+                onClickPlay={() => togglePlaySong(videoId)}
+                onClickRemove={() => removePlaylistItem(videoId)}
             />
         )}
     </div>
