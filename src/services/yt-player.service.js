@@ -23,8 +23,6 @@ function loadVideoPlayer(videoId, container) {
         return;
     }
     const ytPlayer = new window.YT.Player(container, {
-        // height: '1',
-        // width: '1',
         videoId: videoId
     });
     // YT player object doesnt have removeEventListener method
@@ -97,4 +95,35 @@ export function getVideoInfoPlayerStream(videoId) {
     playerSecondary = playerLoadingResult.ytPlayer;
 
     return playerLoadingResult;
+}
+
+// TODO: move below methods to other place
+/**
+ * Get next video id
+ * @param {string} videoId
+ * @param {Array<string>} playlistIds
+ *
+ * @returns {string} videoId
+ */
+export function getNext(videoId, playlistIds) {
+    const videoIdx = playlistIds.indexOf(videoId);
+    if (videoIdx === playlistIds.length - 1) {
+        return playlistIds[0];
+    }
+    return playlistIds[videoIdx + 1];
+}
+
+/**
+ * Get previous video id
+ * @param videoId
+ * @param playlistIds
+ *
+ * @returns {string} videoId
+ */
+export function getPrev(videoId, playlistIds) {
+    const videoIdx = playlistIds.indexOf(videoId);
+    if (videoIdx === 0) {
+        return playlistIds[playlistIds.length - 1];
+    }
+    return playlistIds[videoIdx - 1];
 }

@@ -1,5 +1,7 @@
 export const initialLoadedPlaylistItemState = {
-    id: null,
+    id: false,
+    nextId: false,
+    prevId: false,
     isPlaying: false,
     lastActionPlayTime: 0
 };
@@ -7,9 +9,9 @@ export const initialLoadedPlaylistItemState = {
 export const selectedSong = (state = initialLoadedPlaylistItemState, action) => {
     switch (action.type) {
         case 'SELECTED_SONG/TOGGLE_PLAY':
-            return action.payload;
+            return {...state, ...action.payload};
         case 'SELECTED_SONG/LOAD':
-            return action.payload;
+            return {...state, ...action.payload};
         case 'SELECTED_SONG/SEEK':
             return {...state, ...action.payload};
         default:
@@ -30,10 +32,12 @@ export const isSelectedSongPlaying = (state) => state.selectedSong.isPlaying;
  * @return null | {id, isPlaying, title, duration}
  */
 export const selectedSongData = (state) => {
-    const {id} = state.selectedSong;
+    const {id, nextId, prevId, isPlaying, lastActionPlayTime} = state.selectedSong;
     if (!id) {
         return {
             id: false,
+            nextId: false,
+            prevId: false,
             isPlaying: false,
             title: false,
             duration: NaN,
@@ -41,11 +45,13 @@ export const selectedSongData = (state) => {
         };
     } else {
         return {
-            id: id,
-            isPlaying: state.selectedSong.isPlaying,
+            id,
+            nextId,
+            prevId,
+            isPlaying,
             title: state.playlist[id].title,
             duration: state.playlist[id].duration,
-            currentPlayTime: state.selectedSong.lastActionPlayTime
+            currentPlayTime: lastActionPlayTime
         };
     }
 };

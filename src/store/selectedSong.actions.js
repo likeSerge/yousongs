@@ -1,5 +1,5 @@
-import { playOrPauseVideo, seekVideoToSeconds } from '../services/yt-player.service';
-import { isSelectedSongPlaying } from './selectedSong.reducer';
+import { playOrPauseVideo, seekVideoToSeconds, getPrev, getNext } from '../services/yt-player.service';
+import { isSelectedSongPlaying, selectedSongData } from './selectedSong.reducer';
 
 const togglePlaySongAction = (videoId, playingStatus, lastActionPlayTime) => ({
     type: 'SELECTED_SONG/TOGGLE_PLAY',
@@ -10,10 +10,12 @@ const togglePlaySongAction = (videoId, playingStatus, lastActionPlayTime) => ({
     }
 });
 
-const loadSongAction = (videoId) => ({
+const loadSongAction = (videoId, nextVideoId, prevVideoId) => ({
     type: 'SELECTED_SONG/LOAD',
     payload: {
         id: videoId,
+        nextId: nextVideoId,
+        prevId: prevVideoId,
         isPlaying: false,
         lastActionPlayTime: 0
     }
@@ -23,15 +25,17 @@ const seekToAction = (videoId, secondsToSeek) => ({
     type: 'SELECTED_SONG/SEEK',
     payload: {
         id: videoId,
+        isPlaying: false, // Even if seek during playing, play event will be emitted by player
         lastActionPlayTime: secondsToSeek
     }
 });
 
 /**
  * Keep subscriptions for ytPlayer observables in closure for unsubscribing
- * No need to unsubscribe from ytPlayerOnReady$ because it take(1)
+ * No need to unsubscribe from ytPlayerOnReady$, because it take(1)
  */
 let onStateChangeSubscription = {};
+
 /**
  * @public
  * Thunked action creator on play/pause button click action
@@ -45,8 +49,13 @@ export const togglePlaySong = (videoId) => (dispatch, getState) => {
     const {ytPlayerOnReady$, ytPlayerStateChange$} = playOrPauseVideo(videoId);
     ytPlayerOnReady$.subscribe(
         (ytPlayerReadyEvent) => {
+            const playlistKeys = Object.keys(getState().playlist);
             ytPlayerReadyEvent.target.playVideo();
-            dispatch(loadSongAction(videoId));
+            dispatch(loadSongAction(
+                videoId,
+                getNext(videoId, playlistKeys),
+                getPrev(videoId, playlistKeys)
+            ));
         }
     );
     onStateChangeSubscription = ytPlayerStateChange$.subscribe((ytPlayerStateChangeEvent) => {
@@ -56,6 +65,12 @@ export const togglePlaySong = (videoId) => (dispatch, getState) => {
             dispatch(togglePlaySongAction(videoId, true, lastActionPlayTime));
         } else if (isSelectedSongPlaying(getState())) {
             dispatch(togglePlaySongAction(videoId, false, lastActionPlayTime));
+            // Play next song if current finished
+            const songData = selectedSongData(getState());
+            if (Math.round(songData.duration) === Math.round(lastActionPlayTime)) {
+                // TODO: is recursion good here?
+                dispatch(togglePlaySong(songData.nextId));
+            }
         }
     });
 };

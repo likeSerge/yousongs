@@ -1,5 +1,3 @@
-// TODO: make this work
-
 import React, { Component } from 'react';
 import { secondsToMinutesAndSeconds } from '../../../services/time.service';
 
@@ -10,7 +8,7 @@ export class DurationInfo extends Component {
     }
 
     updateInfo(props) {
-        if (!props.isPlaying && this.intervalId){
+        if (this.intervalId){
             window.clearInterval(this.intervalId);
         }
 
@@ -41,9 +39,8 @@ export class DurationInfo extends Component {
         const {duration} = this.props;
         return (
             <div className="duration-info">
-                123
-                {/*{secondsToMinutesAndSeconds(this.state.currentPlayTime)} /*/}
-                {/*{secondsToMinutesAndSeconds(duration)}*/}
+                {secondsToMinutesAndSeconds(Math.round(this.state.currentPlayTime))} /
+                {secondsToMinutesAndSeconds(Math.round(duration))}
             </div>
         );
     }

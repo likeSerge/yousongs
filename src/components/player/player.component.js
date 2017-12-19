@@ -4,12 +4,18 @@ import { NavigationBar } from './navigation-bar/navigation-bar.component'
 import './player.css';
 
 export const Player = (props) => {
-    const {id, isPlaying, duration, currentPlayTime} = props.selectedSongData;
+    const {id, nextId, prevId, isPlaying, duration, currentPlayTime} = props.selectedSongData;
     const {togglePlaySong, seekToSeconds} = props;
     return (
         <div className="player">
             <div className="player__main-controls">
-                <button disabled={!id}>Prev</button>
+                <button
+                    onClick={() => togglePlaySong(prevId)}
+                    disabled={!prevId}
+                >
+                    Prev
+                </button>
+
                 <button
                     onClick={() => togglePlaySong(id)}
                     disabled={!id}
@@ -17,7 +23,13 @@ export const Player = (props) => {
                     {isPlaying && 'Pause'}
                     {!isPlaying && 'Play'}
                 </button>
-                <button disabled={!id}>Next</button>
+
+                <button
+                    onClick={() => togglePlaySong(nextId)}
+                    disabled={!nextId}
+                >
+                    Next
+                </button>
                 <div className="player__duration">
                     <DurationInfo
                         currentPlayTime={currentPlayTime}
