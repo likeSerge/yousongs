@@ -1,0 +1,19 @@
+.player {
+  &__controls {
+    padding: 10px;
+    border: 3px dashed;
+    background: coral;
+  }
+
+  &__addition-form {
+    padding: 10px;
+    border: 3px dashed;
+    background: aliceblue;
+  }
+
+  &__playlist {
+    padding: 10px;
+    border: 3px dashed;
+    background: cornflowerblue;
+  }
+}
