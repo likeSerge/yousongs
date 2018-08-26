@@ -2,9 +2,11 @@
   "name": "wp-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "node server.js",
+    "heroku-postbuild": "webpack -p",
+    "dev": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -29,6 +31,7 @@
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
+    "express": "^4.16.3",
     "mobx": "^5.0.3",
     "mobx-react": "^5.2.5",
     "react": "^16.2.0",
