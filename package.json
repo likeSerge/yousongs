@@ -21,14 +21,16 @@
     "sass-loader": "^6.0.7",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.20.3",
-    "tslint": "^5.9.1",
+    "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.7.0",
-    "typescript": "^2.7.2",
+    "typescript": "^3.0.1",
     "webpack": "^4.1.1",
     "webpack-cli": "^2.0.10",
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
+    "mobx": "^5.0.3",
+    "mobx-react": "^5.2.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0"
   }

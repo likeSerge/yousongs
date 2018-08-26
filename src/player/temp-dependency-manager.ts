@@ -13,7 +13,7 @@ let playerService: IPlayerService;
 
 export const tempDependencyManager = {
   getPlaylistStore(): IPlaylistStore {
-    if (!playerStore) {
+    if (!playlistStore) {
       playlistStore = new PlaylistStore();
     }
     return playlistStore;

@@ -1,4 +1,10 @@
 .player {
+  &__selected-track {
+    padding: 10px;
+    border: 3px dashed;
+    background: coral;
+  }
+
   &__controls {
     padding: 10px;
     border: 3px dashed;

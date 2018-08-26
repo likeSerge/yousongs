@@ -1,43 +1,47 @@
+export type PlaylistTracks = Map<string, ITrack>;
+
 export interface IPlaylistStore {
-  playlist: ITrack[];
-  selectedTrack: string;
-  volumePercent: number;
-  shuffle: boolean;
+  playlist: PlaylistTracks;
+  selectedTrack: ITrack | undefined;
+  isShuffled: boolean;
 
   addTrack(trackId: string): void;
   removeTrack(trackId: string): void;
   selectTrack(trackId: string): void;
-  setVolume(volumePercent: number): void;
+  selectNext(currentId: string): string;
+  selectPrev(currentId: string): string;
   toggleShuffle(): void;
-  getNext(): string;
-  getPrev(): string;
 }
 
 export interface IPlayerStore {
-  state: string;
+  state: PlayerState;
+  volumePercent: number;
+  positionPercent: number;
 
   play(id: string): void;
   pause(id: string): void;
-  stop(id: string): void;
-  getPosition(id: string): number;
-  seekToPosition(id: string, positionMs: number): void;
+  next(currentId: string): void;
+  prev(currentId: string): void;
+  seekToPosition(positionMs: number): void;
+  setVolume(volumePercent: number): void;
 }
 
-export type TrackChangeCallback = (id: string, state: string) => void;
+export type StateChangeCallback = (state: PlayerState) => void;
 
 export interface IPlayerService {
   // trackState$: Observable<{id: string, state: string}>;
-  subscribeOnTrackStateChange(cb: TrackChangeCallback): void;
+  subscribeOnPlayerStateChange(cb: StateChangeCallback): void;
   fetchTrackData(id: string): Promise<ITrack>;
-  play(trackId: string): void;
+  play(trackId: string, volume: number): void;
   pause(trackId: string): void;
-  setVolume(trackId: string, volume: number): void;
-  setPosition(trackId: string, position: number): void;
+  setVolume(volume: number): void;
+  seekTo(seconds: number, allowSeekAhead?: boolean): void;
+  getCurrentTime(): number;
 }
 
 export interface IStorageService {
-  loadState(): ITrack[];
-  saveState(state: ITrack[]): void;
+  loadState(): PlaylistTracks;
+  saveState(state: PlaylistTracks): void;
 }
 
 export interface ITrack {
@@ -50,7 +54,10 @@ export enum StorageKey {
   Playlist = 'playlist',
 }
 
-export enum TrackState { // TODO: add all states
+export enum PlayerState {
+  Unstarted,
+  Ended,
   Playing,
   Paused,
+  Buffering,
 }

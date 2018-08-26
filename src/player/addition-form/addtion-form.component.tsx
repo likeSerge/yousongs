@@ -1,12 +1,12 @@
 import * as React from 'react';
-
-import './addition-form.scss';
 import { tempDependencyManager } from '../temp-dependency-manager';
 import { IPlaylistStore } from '../types';
+import './addition-form.scss';
+// TODO: create ref
 
 export class AdditionForm extends React.Component {
   private readonly playlistStore: IPlaylistStore;
-  private input: HTMLInputElement;
+  private input: HTMLInputElement | null;
 
   constructor(props:{}) {
     super(props);
@@ -28,6 +28,7 @@ export class AdditionForm extends React.Component {
 
   private addTrack(e: React.SyntheticEvent<HTMLButtonElement>) {
     e.preventDefault();
-    this.playlistStore.addTrack(this.input.value);
+    this.playlistStore.addTrack(this.input!.value);
+    this.input!.value = '';
   }
 }

@@ -1,6 +1,8 @@
-import { IPlayerService, IPlaylistStore, IStorageService, ITrack } from './types';
+import { IPlayerService, IPlaylistStore, IStorageService, ITrack, PlaylistTracks } from './types';
 import { tempDependencyManager } from './temp-dependency-manager';
+import { action, observable } from 'mobx';
 
+// TODO: error handling
 export class PlaylistStore implements IPlaylistStore {
   private readonly playerService: IPlayerService;
   private readonly storageService: IStorageService;
@@ -13,53 +15,44 @@ export class PlaylistStore implements IPlaylistStore {
     this.subscribeToSavePlaylistBeforeUnload();
   }
 
-  playlist: ITrack[] = [];
-  selectedTrack: string = '';
-  volumePercent: number = 50;
-  currentTrack: ITrack;
-  shuffle: boolean;
+  @observable
+  playlist: PlaylistTracks = new Map();
+  @observable
+  selectedTrack: ITrack | undefined;
+
+  // TODO: generate shuffled array once instead of random on next and prev
+  @observable
+  isShuffled: boolean = false;
 
   addTrack(id: string): void {
     this.playerService.fetchTrackData(id)
-      .then((track) => {
-        this.playlist.push(track);
-      });
-    console.log(`add track with id: ${id}`);
+      .then(this.setTrack);
   }
 
+  @action
   removeTrack(id: string): void {
-    console.log(`remove track with id: ${id}`);
-    const indexToRemove = this.playlist.findIndex(listItem => listItem.id === id);
-    if (indexToRemove === -1) {
-      return;
+    if (!this.playlist.delete(id)) {
+      console.warn(`PlaylistStore.removeTrack: no id: ${id} in list`);
     }
-    this.playlist = [
-      ...this.playlist.slice(0, indexToRemove),
-      ...this.playlist.slice(indexToRemove + 1),
-    ];
   }
 
+  @action
   selectTrack(id: string): void {
-    console.log(`select track with id: ${id}`);
-    this.selectedTrack = id;
+    this.selectedTrack = this.playlist.get(id);
   }
 
-  setVolume(volume: number) {
-    alert(`set volume to ${volume}`);
+  // TODO: getNext and select from playerStore
+  selectNext = (currentId: string): string => {
+    return this.selectNextOrPrev(currentId, this.getNextTrackId);
   }
 
-  getNext(): string {
-    alert('play next');
-    return '';
+  selectPrev(currentId: string): string {
+    return this.selectNextOrPrev(currentId, this.getPrevTrackId);
   }
 
-  getPrev(): string {
-    alert('play prev');
-    return '';
-  }
-
-  toggleShuffle(): void {
-    alert('toggle shuffle');
+  @action
+  toggleShuffle = (): void => {
+    this.isShuffled = !this.isShuffled;
   }
 
   private loadPlaylistOnStart(): void {
@@ -73,5 +66,53 @@ export class PlaylistStore implements IPlaylistStore {
 
   private savePlaylistBeforeLeavingPage = (): void => {
     this.storageService.saveState(this.playlist);
+  }
+
+  @action.bound
+  private setTrack(track: ITrack): void {
+    this.playlist.set(track.id, track);
+  }
+
+  private get trackIds(): string[] {
+    return [...this.playlist.keys()];
+  }
+
+  private selectNextOrPrev(
+    currentTrackId: string,
+    getNextOrPrev: (currentTrackIndex: number) => string,
+  ): string {
+    const currentTrackIndex = this.trackIds.indexOf(currentTrackId);
+    const nextTrackId = this.isShuffled
+      ? this.getShuffledId(currentTrackIndex)
+      : getNextOrPrev(currentTrackIndex);
+
+    this.selectTrack(nextTrackId);
+
+    return nextTrackId;
+  }
+
+  private getShuffledId(currentTrackIndex: number): string {
+    // The maximum is exclusive and the minimum is inclusive
+    const min = 0;
+    const max = this.playlist.size; // max index + 1 to exclude 1 number(current)
+    const randBeforeExclusion = Math.floor(Math.random() * (max - min)) + min;
+    const shuffledIndex = randBeforeExclusion === currentTrackIndex
+      ? randBeforeExclusion + 1
+      : randBeforeExclusion;
+    return shuffledIndex === this.playlist.size
+      ? this.trackIds[0]
+      : this.trackIds[shuffledIndex];
+  }
+
+  private getNextTrackId = (currentTrackIndex: number): string => {
+    return (currentTrackIndex === (this.playlist.size - 1))
+      ? this.trackIds[0]
+      : this.trackIds[currentTrackIndex + 1]; // also '-1' case of indexOf
+  }
+
+  private getPrevTrackId = (currentTrackIndex: number): string => {
+    return  (currentTrackIndex === 0)
+      ? this.trackIds[this.playlist.size - 1]
+      : this.trackIds[currentTrackIndex - 1];
   }
 }

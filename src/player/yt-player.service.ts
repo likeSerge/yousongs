@@ -1,5 +1,4 @@
-// import { Promise } from 'es6-promise';
-import { IPlayerService, ITrack, TrackChangeCallback } from './types';
+import { IPlayerService, ITrack, PlayerState, StateChangeCallback } from './types';
 
 enum DivForYotubeIframeId {
   PlayingSong = 'youtube-div-for-playing-song',
@@ -12,6 +11,7 @@ const UNTYPED_WINDOW = window as any;
 export class YtPlayerService implements IPlayerService {
   private playerForGettingSongData: any = undefined;
   private playerForPlayingSong: any = undefined;
+  private stateChangeListeners: StateChangeCallback[] = [];
 
   constructor() {
     YtPlayerService.prepareYoutubeService();
@@ -40,36 +40,39 @@ export class YtPlayerService implements IPlayerService {
     });
   }
 
-  play(videoId: string): void {
-    console.log('YT play');
+  play(videoId: string, volume: number): void {
     if (YtPlayerService.isVideoLoadedToPlayer(videoId, this.playerForPlayingSong)) {
       this.playerForPlayingSong.playVideo();
     } else {
       if (this.playerForPlayingSong) {
         this.playerForPlayingSong.destroy();
       }
-      this.playerForPlayingSong = YtPlayerService.createPlayerAndStartPlaying(videoId);
+      this.playerForPlayingSong = this.createPlayerAndStartPlaying(videoId, volume);
     }
   }
 
   pause(trackId: string): void {
-    console.log('YT pause');
     if (this.playerForPlayingSong) {
       this.playerForPlayingSong.pauseVideo();
     }
   }
 
-
-  setVolume(trackId: string, volume: number): void {
-    alert('YT setVolume');
+  setVolume(volume: number): void {
+    if (this.playerForPlayingSong) {
+      this.playerForPlayingSong.setVolume(volume);
+    }
   }
 
-  setPosition(trackId: string, position: number): void {
-    alert('YT setPosition');
+  seekTo(positionSeconds: number, allowSeekAhead: boolean = false): void {
+    this.playerForPlayingSong.seekTo(positionSeconds, allowSeekAhead);
   }
 
-  subscribeOnTrackStateChange(cb: TrackChangeCallback): void {
-    alert('YT subscribeOnTrackStateChange');
+  subscribeOnPlayerStateChange(cb: StateChangeCallback): void {
+    this.stateChangeListeners.push(cb);
+  }
+
+  getCurrentTime(): number {
+    return this.playerForPlayingSong.getCurrentTime();
   }
 
   private static prepareYoutubeService(): void {
@@ -82,7 +85,7 @@ export class YtPlayerService implements IPlayerService {
     const youtubeScriptTag = document.createElement('script');
     youtubeScriptTag.src = YOUTUBE_API_SCRIPT_SRC;
     const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(youtubeScriptTag, firstScriptTag);
+    firstScriptTag!.parentNode!.insertBefore(youtubeScriptTag, firstScriptTag);
   }
 
   private static addDivWithId(divId: DivForYotubeIframeId): void {
@@ -99,11 +102,12 @@ export class YtPlayerService implements IPlayerService {
   }
 
   private static isVideoLoadedToPlayer(videoId: string, player: any): boolean {
-    return player && player.getVideoData().video_id === videoId;
+    // Player can be defined, but not usable(on quick 'next clicks')
+    return !!player && !!player.getVideoData && player.getVideoData().video_id === videoId;
   }
 
-  private static createPlayerAndStartPlaying(id: string): any {
-    // playerForPlayingSong variable needed to pass onReady callback
+  private createPlayerAndStartPlaying(id: string, volume: number): any {
+    // playerForPlayingSong variable needed for onReady callback
     const playerForPlayingSong = new UNTYPED_WINDOW.YT.Player(
       DivForYotubeIframeId.PlayingSong,
       {
@@ -111,11 +115,47 @@ export class YtPlayerService implements IPlayerService {
         height: '0',
         width: '0',
         events: {
-          onReady: () => playerForPlayingSong.playVideo(),
+          onReady: () => {
+            playerForPlayingSong.playVideo();
+            this.setVolume(volume);
+          },
+          onStateChange: this.onPlayerStateChange,
         },
       });
 
     return playerForPlayingSong;
+  }
+
+  private onPlayerStateChange = (event: any): void => {
+    this.stateChangeListeners.map(
+      listener => listener(YtPlayerService.ytPlayerStateToPlayerState(event.data)),
+    );
+  }
+
+  /**
+  -1 – unstarted
+   0 – ended
+   1 – playing
+   2 – paused
+   3 – buffering
+   5 – video cued
+   */
+  private static ytPlayerStateToPlayerState(state: number): PlayerState {
+    switch (state) {
+      case -1:
+      case 5:
+        return PlayerState.Unstarted;
+      case 0:
+        return PlayerState.Ended;
+      case 1:
+        return PlayerState.Playing;
+      case 2:
+        return PlayerState.Paused;
+      case 3:
+        return PlayerState.Buffering;
+      default:
+        return PlayerState.Unstarted;
+    }
   }
 
   private static createPlayerAndGetData(id: string, cb: Function): any {

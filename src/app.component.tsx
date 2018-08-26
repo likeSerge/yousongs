@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Player } from './player/player.component'
+import { Player } from './player/player.component';
 
 import './app.scss';
 

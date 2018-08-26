@@ -1,9 +1,10 @@
 import * as React from 'react';
-
-import './playlist.scss';
+import { observer } from 'mobx-react';
 import { tempDependencyManager } from '../temp-dependency-manager';
-import { IPlayerService, IPlayerStore, IPlaylistStore } from '../types';
+import { IPlayerStore, IPlaylistStore } from '../types';
+import './playlist.scss';
 
+@observer
 export class Playlist extends React.Component {
   private playlistStore: IPlaylistStore;
   private playerStore: IPlayerStore;
@@ -16,11 +17,10 @@ export class Playlist extends React.Component {
   }
 
   render() {
-    console.log(this.playlistStore.playlist);
     return (
       <div className="playlist">
         {
-          this.playlistStore.playlist.map(track => (
+          [...this.playlistStore.playlist.values()].map(track => (
             <div
               key={track.id}
               className="playlist__item"
@@ -45,7 +45,6 @@ export class Playlist extends React.Component {
   }
 
   private playTrack(id: string): void {
-    this.playlistStore.selectTrack(id);
     this.playerStore.play(id);
   }
 }
