@@ -1,6 +1,6 @@
 import { IPlayerService, IPlayerStore, IPlaylistStore, PlayerState } from './types';
 import { tempDependencyManager } from './temp-dependency-manager';
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 export class PlayerStore implements IPlayerStore {
   private readonly playlistStore: IPlaylistStore;
@@ -11,7 +11,7 @@ export class PlayerStore implements IPlayerStore {
     this.playlistStore = tempDependencyManager.getPlaylistStore();
     this.playerService = tempDependencyManager.getPlayerService();
     this.playerService.subscribeOnPlayerStateChange((state: PlayerState) => {
-      this.state = state;
+      this.setState(state);
       this.adjustPosition();
       this.playNextOnCurrentEnded();
     });
@@ -20,9 +20,16 @@ export class PlayerStore implements IPlayerStore {
   @observable
   state: PlayerState;
   @observable
-  volumePercent: number = 50;
+  private volumePercentCurrent: number = 50;
+  @observable
+  isMuted: boolean = false;
   @observable
   positionPercent: number = 0;
+
+  @computed
+  get volumePercent(): number {
+    return this.isMuted ? 0 : this.volumePercentCurrent;
+  }
 
   play(id: string): void {
     if (!this.playlistStore.selectedTrack || id !== this.playlistStore.selectedTrack.id) {
@@ -50,8 +57,19 @@ export class PlayerStore implements IPlayerStore {
 
   @action
   setVolume = (volume: number): void => {
-    this.volumePercent = volume;
+    this.volumePercentCurrent = volume;
+    // TODO: handle side effect?
     this.playerService.setVolume(volume);
+  }
+
+  toggleMute = (): void => {
+    this.setIsMuted(!this.isMuted);
+    this.playerService.setVolume(this.volumePercent);
+  }
+
+  @action
+  setIsMuted = (isMuted: boolean): void => {
+    this.isMuted = isMuted;
   }
 
   seekToPosition = (positionPercent: number): void => {
@@ -65,6 +83,11 @@ export class PlayerStore implements IPlayerStore {
   @action
   setPosition(positionPercent: number): void {
     this.positionPercent = positionPercent;
+  }
+
+  @action
+  private setState(state: PlayerState): void {
+    this.state = state;
   }
 
   private adjustPosition(): void {

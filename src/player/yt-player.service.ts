@@ -30,6 +30,7 @@ export class YtPlayerService implements IPlayerService {
           id: videoId,
           name: this.playerForGettingSongData.getVideoData().title,
           durationMs: this.playerForGettingSongData.getDuration() * 1000,
+          thumbnail: `http://img.youtube.com/vi/${videoId}/0.jpg`,
         });
       };
 
@@ -114,6 +115,9 @@ export class YtPlayerService implements IPlayerService {
         videoId: id,
         height: '0',
         width: '0',
+        playerVars: {
+          playsinline: 1,
+        },
         events: {
           onReady: () => {
             playerForPlayingSong.playVideo();

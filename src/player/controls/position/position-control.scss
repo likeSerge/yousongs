@@ -1,0 +1,15 @@
+.position-control {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__time {
+    display: inline-block;
+  }
+
+  &__slider {
+    width: 70%;
+    margin: 0 20px;
+  }
+}

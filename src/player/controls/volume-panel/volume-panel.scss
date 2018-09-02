@@ -1,0 +1,17 @@
+.volume-panel {
+  $button-size: 50px;
+
+  height: $button-size;
+  display: flex;
+  justify-content: center;
+
+  &__mute,
+  &__shuffle {
+    width: $button-size;
+  }
+
+  &__slider {
+    width: 70%;
+    margin: 0 10px;
+  }
+}

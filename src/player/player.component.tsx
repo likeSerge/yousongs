@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Controls } from './controls/controls.component';
 import { AdditionForm } from './addition-form/addtion-form.component';
 import { Playlist } from './playlist/playlist.component';
-import { SelectedTrack } from './selected-track/selected-track.component';
+import { TrackName } from './track-name/track-name.component';
 
 import './player.scss';
 
@@ -12,7 +12,7 @@ export class Player extends React.Component {
     return (
       <div className="player">
         <div className="player__selected-track">
-          <SelectedTrack/>
+          <TrackName/>
         </div>
         <div className="player__controls">
           <Controls/>

@@ -16,7 +16,6 @@ export function throttle(func: any, wait: any, options: any = {}): any {
   var throttled = function() {
     var now = Date.now();
     if (!previous && !options.leading) previous = now;
-    console.log(`***DEBUG*** wait, now, previous :`, wait, now, previous);
     var remaining = wait - (now - previous);
     context = this;
     args = arguments;
@@ -44,3 +43,22 @@ export function throttle(func: any, wait: any, options: any = {}): any {
   return throttled;
 }
 /* tslint:enable */
+
+/**
+ * Add '0' before 1-digit numbers
+ */
+const toTwoDigitsFormat = (timeUnit: number): string =>
+  timeUnit > 9 ? ('' + timeUnit) : ('0' + timeUnit);
+
+/**
+ * Translates seconds to 'mm:ss' ('90' -> '01:30')
+ */
+export const secondsToMinutesAndSeconds = (timeInSeconds: number): string => {
+  if (isNaN(timeInSeconds)) {
+    return '--:--';
+  }
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+
+  return `${toTwoDigitsFormat(minutes)}:${toTwoDigitsFormat(seconds)}`;
+};

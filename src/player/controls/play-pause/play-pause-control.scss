@@ -1,0 +1,28 @@
+.play-pause-control {
+  position: relative;
+  height: 90px;
+  width: 160px;
+  margin: 10px;
+  border-radius: 20px;
+  overflow: hidden;
+
+  &__icon {
+    position: absolute;
+    left: 50%;
+    top: 21px;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 0 10px 7px white;
+    cursor: pointer;
+    background: rgba(128, 128, 128, 0.75);
+  }
+
+  &__thumbnail {
+    position: relative;
+    top: -15px;
+    height: 120px;
+    width: 160px;
+    opacity: 0.7;
+  }
+}

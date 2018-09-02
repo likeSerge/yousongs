@@ -14,7 +14,8 @@ module.exports = {
   devtool: "source-map",
 
   devServer: {
-    contentBase: './dist'
+    contentBase: './dist',
+    host: '0.0.0.0',
   },
 
   resolve: {
@@ -25,6 +26,9 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/, loader: "awesome-typescript-loader"
+      },
+      {
+        test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'
       },
       {
         test: /\.scss$/,

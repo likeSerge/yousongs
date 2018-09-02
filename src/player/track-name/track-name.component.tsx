@@ -2,10 +2,11 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import { tempDependencyManager } from '../temp-dependency-manager';
 import { IPlaylistStore } from '../types';
-import './selected-track.scss';
+
+import './track-name.scss';
 
 @observer
-export class SelectedTrack extends React.Component {
+export class TrackName extends React.Component {
   private readonly playlistStore: IPlaylistStore;
 
   constructor(props: {}) {

@@ -16,6 +16,7 @@ export interface IPlaylistStore {
 export interface IPlayerStore {
   state: PlayerState;
   volumePercent: number;
+  isMuted: boolean;
   positionPercent: number;
 
   play(id: string): void;
@@ -24,6 +25,7 @@ export interface IPlayerStore {
   prev(currentId: string): void;
   seekToPosition(positionMs: number): void;
   setVolume(volumePercent: number): void;
+  toggleMute(): void;
 }
 
 export type StateChangeCallback = (state: PlayerState) => void;
@@ -48,6 +50,7 @@ export interface ITrack {
   id: string;
   name: string;
   durationMs: number;
+  thumbnail: string;
 }
 
 export enum StorageKey {
