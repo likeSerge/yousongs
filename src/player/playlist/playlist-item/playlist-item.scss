@@ -1,0 +1,29 @@
+@import "../../../variables";
+
+.playlist-item {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+
+  &_selected {
+    background: $color1;
+  }
+
+  &__play-icon {
+    width: 50px;
+    height: 35px;
+  }
+
+  &__name {
+    margin-left: 7px;
+  }
+
+  &__remove-icon {
+    position: absolute;
+    right: 0;
+    width: 35px;
+    height: 35px;
+  }
+}

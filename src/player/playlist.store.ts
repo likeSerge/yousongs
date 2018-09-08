@@ -70,7 +70,7 @@ export class PlaylistStore implements IPlaylistStore {
 
   @action.bound
   private checkAndSetTrack(track: ITrack): void {
-    if (!track.id) {
+    if (track.name === '') {
       return;
     }
     this.playlist.set(track.id, track);

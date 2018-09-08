@@ -1,3 +1,5 @@
+@import "../../../variables";
+
 .play-pause-control {
   position: relative;
   height: 90px;
@@ -13,9 +15,9 @@
     transform: translateX(-50%);
     width: 50px;
     height: 50px;
-    box-shadow: 0 0 10px 7px white;
+    box-shadow: 0 0 10px 7px $color3;
     cursor: pointer;
-    background: rgba(128, 128, 128, 0.75);
+    background: rgba($color1, 0.75);
   }
 
   &__thumbnail {

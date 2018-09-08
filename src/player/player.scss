@@ -1,8 +1,8 @@
+@import "../variables";
+
 .player {
   &__selected-track {
     height: 50px;
-    border: 3px dashed;
-    background: #279aff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,8 +11,7 @@
   &__controls {
     height: 250px;
     padding: 10px;
-    border: 3px dashed;
-    background: coral;
+    background: $color1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,13 +21,9 @@
     display: flex;
     justify-content: center;
     padding: 10px;
-    border: 3px dashed;
-    background: aliceblue;
   }
 
   &__playlist {
     padding: 10px;
-    border: 3px dashed;
-    background: cornflowerblue;
   }
 }
