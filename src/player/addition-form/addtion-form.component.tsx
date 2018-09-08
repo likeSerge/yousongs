@@ -2,11 +2,10 @@ import * as React from 'react';
 import { tempDependencyManager } from '../temp-dependency-manager';
 import { IPlaylistStore } from '../types';
 import './addition-form.scss';
-// TODO: create ref
 
 export class AdditionForm extends React.Component {
   private readonly playlistStore: IPlaylistStore;
-  private input: HTMLInputElement | null;
+  private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   constructor(props:{}) {
     super(props);
@@ -19,7 +18,18 @@ export class AdditionForm extends React.Component {
     return (
       <div className="addition-form">
         <form>
-          <input type="text" ref={input => this.input = input} />
+          <label
+            className="addition-form__title"
+            htmlFor="track"
+          >
+            Link to youtube video:
+          </label>
+          <input
+            className="addition-form__input"
+            type="text"
+            name="track"
+            ref={this.inputRef}
+          />
           <button onClick={this.addTrack}>ADD TRACK</button>
         </form>
       </div>
@@ -28,7 +38,7 @@ export class AdditionForm extends React.Component {
 
   private addTrack(e: React.SyntheticEvent<HTMLButtonElement>) {
     e.preventDefault();
-    this.playlistStore.addTrack(this.input!.value);
-    this.input!.value = '';
+    this.playlistStore.addTrack(this.inputRef.current!.value);
+    this.inputRef.current!.value = '';
   }
 }

@@ -9,7 +9,7 @@
   }
 
   &__controls {
-    height: 300px;
+    height: 250px;
     padding: 10px;
     border: 3px dashed;
     background: coral;
@@ -19,6 +19,8 @@
   }
 
   &__addition-form {
+    display: flex;
+    justify-content: center;
     padding: 10px;
     border: 3px dashed;
     background: aliceblue;

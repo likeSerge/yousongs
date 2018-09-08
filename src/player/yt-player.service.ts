@@ -59,7 +59,7 @@ export class YtPlayerService implements IPlayerService {
   }
 
   setVolume(volume: number): void {
-    if (this.playerForPlayingSong) {
+    if (this.playerForPlayingSong && this.playerForPlayingSong.setVolume) {
       this.playerForPlayingSong.setVolume(volume);
     }
   }

@@ -26,7 +26,7 @@ export class PlaylistStore implements IPlaylistStore {
 
   addTrack(id: string): void {
     this.playerService.fetchTrackData(id)
-      .then(this.setTrack);
+      .then(this.checkAndSetTrack);
   }
 
   @action
@@ -69,7 +69,10 @@ export class PlaylistStore implements IPlaylistStore {
   }
 
   @action.bound
-  private setTrack(track: ITrack): void {
+  private checkAndSetTrack(track: ITrack): void {
+    if (!track.id) {
+      return;
+    }
     this.playlist.set(track.id, track);
   }
 
